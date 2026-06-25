@@ -8,7 +8,7 @@ use App\Models\SyncLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class ProductSyncService
+class ProductSyncServices
 {
     public function __construct(
         private readonly JubelioClient $client
