@@ -5,32 +5,40 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class ProductVariant extends Model
+class SalesOrderItem extends Model
 {
     use SoftDeletes;
 
-     protected $table = 'product_variants';
-
     protected $fillable = [
-        'product_id',
-        'jubelio_item_id',
-        'jubelio_item_group_id',
+        'sales_order_id',
+        'jubelio_salesorder_detail_id',
         'odoo_id',
-        'odoo_product_tmpl_id',
+        'item_id',
+        'item_group_id',
         'item_code',
         'item_name',
-        'barcode',
+        'description',
+        'qty',
+        'qty_in_base',
+        'uom_id',
+        'unit',
+        'price',
+        'sell_price',
+        'original_price',
+        'disc',
+        'disc_amount',
+        'disc_marketplace',
+        'tax_id',
+        'tax_name',
+        'tax_amount',
+        'rate',
+        'amount',
+        'variant',
         'thumbnail',
         'is_bundle',
-        'invt_acct_id',
-        'tax_rate',
-        'sell_price',
-        'variation_values',
-        'end_qty',
-        'order_qty',
-        'available_qty',
+        'is_free_gift',
+        'weight_in_gram',
         'raw_payload',
         'sync_from_jubelio',
         'sync_from_jubelio_at',
@@ -43,30 +51,27 @@ class ProductVariant extends Model
     ];
 
     protected $casts = [
-        'variation_values'           => 'array',
         'raw_payload'                => 'array',
         'is_bundle'                  => 'boolean',
+        'is_free_gift'               => 'boolean',
         'sync_from_jubelio'          => 'boolean',
         'sync_from_jubelio_at'       => 'datetime',
         'sync_to_odoo'               => 'boolean',
         'sync_to_odoo_at'            => 'datetime',
         'sync_to_odoo_next_retry_at' => 'datetime',
-        'sell_price'                 => 'decimal:4',
-        'end_qty'                    => 'decimal:4',
-        'order_qty'                  => 'decimal:4',
-        'available_qty'              => 'decimal:4',
+        'qty'                        => 'decimal:4',
+        'qty_in_base'                => 'decimal:4',
+        'price'                      => 'decimal:4',
+        'amount'                     => 'decimal:4',
+        'disc'                       => 'decimal:2',
+        'disc_amount'                => 'decimal:4',
+        'tax_amount'                 => 'decimal:4',
     ];
 
     // ── Relationships ────────────────────────────────────────────────────────
 
-    public function product(): BelongsTo
+    public function salesOrder(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
-    }
-
-    public function syncLogs(): HasMany
-    {
-        return $this->hasMany(SyncLog::class, 'entity_id')
-                    ->where('entity_type', 'product_variant');
+        return $this->belongsTo(SalesOrder::class);
     }
 }

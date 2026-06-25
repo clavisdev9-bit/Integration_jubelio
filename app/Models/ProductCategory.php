@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductCategory extends Model
 {
+
+     protected $table = 'product_categories';
+
     protected $fillable = [
         'jubelio_category_id',
         'category_name',
