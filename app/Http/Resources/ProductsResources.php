@@ -30,7 +30,8 @@ class ProductsResources extends JsonResource
             // =========================
             // PRODUCT TYPE
             // =========================
-            'is_bundle' => (int) $this->total_composition > 0,
+            // 'is_bundle' => (int) $this->total_composition > 0,
+           'is_bundle' => $this->variants->contains('is_bundle', true),
 
             'is_consignment' => $this->is_consignment,
 
@@ -43,9 +44,12 @@ class ProductsResources extends JsonResource
 
             'barcode' => $variant?->barcode,
 
-            'price' => $variant?->sell_price,
+             // 'stock' => $variant?->available_qty,
+            'stock' => $this->variants->sum('available_qty'),
 
-            'stock' => $variant?->available_qty,
+            // 'price' => $variant?->sell_price,
+            'price' => $variant?->sell_price, 
+
 
             'variant_count' => $this->variants->count(),
 
