@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Odoo\OdooDebugController;
 use App\Http\Controllers\Api\Jubelio\JubelioProductController;
 use App\Http\Controllers\Api\Odoo\OdooProductController;
 use App\Http\Controllers\Api\Reports\Master\ProductsController;
+use App\Http\Controllers\Api\Reports\Master\SupplierController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -40,6 +41,7 @@ Route::prefix('odoo')->group(function () {
 
 // start route API for External  (reports)
 Route::get('/master-products', [ProductsController::class, 'index'])->name('api.index');
+Route::get('/master-supplier', [SupplierController::class, 'index'])->name('api.index');
 
 
 
