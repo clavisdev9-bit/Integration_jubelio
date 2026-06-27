@@ -149,7 +149,7 @@ return [
     // ? ['web']
     // : ['web', RestrictedDocsAccess::class],
 
-    // 'extensions' => [],
+    'extensions' => [],
 
     /*
      * Automatically document API security (OpenAPI `security` / `securitySchemes`) based on route
