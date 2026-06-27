@@ -29,8 +29,13 @@ class ProductsValidationIndex extends FormRequest
             'sort_dir' => 'nullable|in:asc,desc',
             'page' => 'nullable|integer|min:1',
             'only_deleted' => 'nullable|boolean',
+
+             'date_from' => 'nullable|date',
+             'date_to'   => 'nullable|date|after_or_equal:date_from',
         ];
     }
+
+    
 
     
     protected function prepareForValidation(): void

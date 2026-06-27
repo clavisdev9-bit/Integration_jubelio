@@ -104,6 +104,22 @@ public static function isDuplicate(array $data, $id = null): array
 }
 
 
+public function scopeFilterDate(
+    Builder $query,
+    ?string $dateFrom,
+    ?string $dateTo
+): Builder {
+
+    return $query
+        ->when($dateFrom, function ($q) use ($dateFrom) {
+            $q->whereDate('created_at', '>=', $dateFrom);
+        })
+        ->when($dateTo, function ($q) use ($dateTo) {
+            $q->whereDate('created_at', '<=', $dateTo);
+        });
+}
+
+
 // relasi
 public function category()
 {

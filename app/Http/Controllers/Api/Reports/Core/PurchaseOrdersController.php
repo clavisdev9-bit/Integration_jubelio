@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Reports\Core;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -110,6 +111,96 @@ class PurchaseOrdersController extends Controller
             new PurchaseOrderDetailResource($purchaseOrder),
             'Success'
         );
+    }
+
+
+
+public function dashboard()
+    {
+        $summary = [
+
+            'total_purchase_orders' => Po::count(),
+
+            'open_purchase_orders' => Po::where('is_closed', false)->count(),
+
+            'closed_purchase_orders' => Po::where('is_closed', true)->count(),
+
+            'total_suppliers' => Po::distinct('contact_id')->count('contact_id'),
+
+            'total_amount' => Po::sum('grand_total'),
+
+            'today_purchase_orders' => Po::whereDate(
+                'transaction_date',
+                today()
+            )->count(),
+
+            'this_month_purchase_orders' => Po::whereMonth(
+                'transaction_date',
+                now()->month
+            )
+            ->whereYear(
+                'transaction_date',
+                now()->year
+            )
+            ->count(),
+
+        ];
+
+        $integration = [
+
+            'waiting_fetch_detail' => Po::where('detail_fetched', false)->count(),
+
+            'success_fetch_detail' => Po::where('detail_fetched', true)->count(),
+
+            'failed_fetch_detail' => Po::where('detail_fetched', false)
+                ->whereNotNull('sync_from_jubelio_error')
+                ->count(),
+
+            'waiting_sync_to_odoo' => Po::where('sync_to_odoo', false)
+                ->whereNull('sync_error')
+                ->count(),
+
+            'success_sync_to_odoo' => Po::where('sync_to_odoo', true)
+                ->count(),
+
+            'failed_sync_to_odoo' => Po::whereNotNull('sync_error')
+                ->count(),
+
+            'success_sync_from_jubelio' => Po::where('sync_from_jubelio', true)
+                ->count(),
+
+            'failed_sync_from_jubelio' => Po::whereNotNull('sync_from_jubelio_error')
+                ->count(),
+
+        ];
+
+        $monthlyChart = Po::selectRaw("
+                EXTRACT(MONTH FROM transaction_date) as month,
+                COUNT(*) as total_po,
+                COALESCE(SUM(grand_total),0) as total_amount
+            ")
+            ->whereYear('transaction_date', now()->year)
+            ->groupByRaw("EXTRACT(MONTH FROM transaction_date)")
+            ->orderByRaw("EXTRACT(MONTH FROM transaction_date)")
+            ->get();
+
+        $topSuppliers = Po::selectRaw("
+                supplier_name,
+                COUNT(*) as total_po,
+                COALESCE(SUM(grand_total),0) as total_amount
+            ")
+            ->whereNotNull('supplier_name')
+            ->groupBy('supplier_name')
+            ->orderByDesc('total_amount')
+            ->limit(10)
+            ->get();
+
+        return ApiResponse::success([
+            'summary' => $summary,
+            'integration' => $integration,
+            'monthly_chart' => $monthlyChart,
+            'top_suppliers' => $topSuppliers,
+        ], 'Success');
     }
 }
 

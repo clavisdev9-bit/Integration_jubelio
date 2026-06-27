@@ -45,6 +45,9 @@ class ProductsController extends Controller
         $sortDir     = $validated['sort_dir'] ?? 'desc';
         $onlyDeleted = (bool) ($validated['only_deleted'] ?? false);
 
+        $dateFrom = $validated['date_from'] ?? null;
+        $dateTo   = $validated['date_to'] ?? null;
+
         $query = $this->MasterProduct
             ->with([
                 'category',
@@ -52,20 +55,17 @@ class ProductsController extends Controller
             ])
             ->when($onlyDeleted, fn ($q) => $q->onlyTrashed())
             ->search($search)
+             ->filterDate($dateFrom, $dateTo)
             ->sort($sortBy, $sortDir);
-        // $results = $query->paginate($perPage);
+            // $results = $query->paginate($perPage);
             $results = $query->get();
             $message = $results->isEmpty()
                 ? 'Data yang Anda cari tidak ditemukan'
                 : 'Success';
-        // return ApiResponse::paginate(
-        //     new ProductsResourcesCollection($results),
-        //     $message
-        // );
         
-    return ApiResponse::success(
-        new ProductsResourcesCollection($results),
-        $message
-    );
+                return ApiResponse::success(
+                    new ProductsResourcesCollection($results),
+                    $message
+                );
     }
 }

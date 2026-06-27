@@ -55,7 +55,11 @@ Route::prefix('purchase-orders')->group(function () {
     Route::get('/id/{id}', [PurchaseOrdersController::class, 'showById']);
     Route::get('/number/{purchaseorder_no}', [PurchaseOrdersController::class, 'showByNumber']);
     Route::get('/ref/{ref_no}', [PurchaseOrdersController::class, 'showByRef'])
-        ->where('ref_no', '.*');
+                ->where('ref_no', '.*');
+    Route::get(
+        '/dashboard',
+        [PurchaseOrdersController::class, 'dashboard']
+    );            
 
 });
 
