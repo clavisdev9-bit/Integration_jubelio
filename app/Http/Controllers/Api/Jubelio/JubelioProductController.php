@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Api\Jubelio;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\JubelioService;
+use Dedoc\Scramble\Attributes\ExcludeRouteFromDocs;
 
 class JubelioProductController extends Controller
 {
+    #[ExcludeRouteFromDocs]
     public function index(JubelioService $jubelio)
     {
         $response = $jubelio

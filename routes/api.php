@@ -9,9 +9,9 @@ use App\Http\Controllers\Api\Reports\Master\ProductsController;
 use App\Http\Controllers\Api\Reports\Master\SupplierController;
 use App\Http\Controllers\Api\Reports\Core\PurchaseOrdersController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// Route::get('/user', function (Request $request) {
+//     return $request->user();
+// })->middleware('auth:sanctum');
 
 
 
@@ -43,10 +43,9 @@ Route::prefix('odoo')->group(function () {
 // start route API for External  (reports)
 Route::get('/master-products', [ProductsController::class, 'index'])->name('api.index');
 Route::get('/master-supplier', [SupplierController::class, 'index'])->name('api.index');
-// Route::get('/purchase-order', [PurchaseOrdersController::class, 'index'])->name('api.index');
 
 
-// List Purchase Order
+// List Purchase Order Route
 Route::prefix('purchase-orders')->group(function () {
     // all data po
     Route::get('/', [PurchaseOrdersController::class, 'index']);
@@ -56,6 +55,7 @@ Route::prefix('purchase-orders')->group(function () {
     Route::get('/number/{purchaseorder_no}', [PurchaseOrdersController::class, 'showByNumber']);
     Route::get('/ref/{ref_no}', [PurchaseOrdersController::class, 'showByRef'])
                 ->where('ref_no', '.*');
+    // Dashboard 
     Route::get(
         '/dashboard',
         [PurchaseOrdersController::class, 'dashboard']

@@ -15,7 +15,9 @@ use App\Models\MasterSupplier;
 use App\Http\Requests\SupplierValidationIndex;
 use App\Http\Resources\SupplierResources;
 use App\Http\Resources\SupplierResourcesCollection;
+use Dedoc\Scramble\Attributes\Group;
 
+#[Group('URL API Master')]
 
 class SupplierController extends Controller
 {
@@ -24,8 +26,12 @@ class SupplierController extends Controller
     public function __construct(MasterSupplier $MasterSupplier) {
         $this->MasterSupplier = $MasterSupplier;
     }
-    /**
-     * Display a listing of the resource.
+
+    
+      /**
+     * Get Master Supplier
+     *
+     * Mengambil daftar supplier.
      */
     public function index(SupplierValidationIndex $request)
     {

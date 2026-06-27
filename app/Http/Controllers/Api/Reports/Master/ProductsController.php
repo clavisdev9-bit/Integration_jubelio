@@ -24,7 +24,8 @@ use App\Http\Requests\ProductsValidationIndex;
 use App\Http\Resources\ProductsResource;
 use App\Http\Resources\ProductsResourcesCollection;
 
-
+use Dedoc\Scramble\Attributes\Group;
+#[Group('URL API Master')]
 class ProductsController extends Controller
 {
     protected $MasterProduct;
@@ -33,7 +34,9 @@ class ProductsController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Get Master Product
+     *
+     * Mengambil daftar Product.
      */
     public function index(ProductsValidationIndex $request)
     {

@@ -18,6 +18,8 @@ use App\Http\Resources\PurchaseOrderDetailResource;
 use App\Models\PoItem;
 use App\Models\Po;
 
+use Dedoc\Scramble\Attributes\Group;
+#[Group('URL API PURCHASE ORDER')]
 
 class PurchaseOrdersController extends Controller
 {

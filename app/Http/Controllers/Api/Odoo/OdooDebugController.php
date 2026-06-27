@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Api\Odoo;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\OdooService;
+use Dedoc\Scramble\Attributes\ExcludeRouteFromDocs;
 
 class OdooDebugController extends Controller
 {
+     #[ExcludeRouteFromDocs]
     public function execute(
         Request $request,
         OdooService $odoo

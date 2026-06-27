@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api\Odoo;
 
 use App\Http\Controllers\Controller;
 use App\Services\OdooService;
+use Dedoc\Scramble\Attributes\ExcludeRouteFromDocs;
 
 class OdooProductController extends Controller
 {
+     #[ExcludeRouteFromDocs]
     // public function index(OdooService $odoo)
     // {
     //     $products = $odoo->execute(
