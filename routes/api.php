@@ -8,10 +8,8 @@ use App\Http\Controllers\Api\Odoo\OdooProductController;
 use App\Http\Controllers\Api\Reports\Master\ProductsController;
 use App\Http\Controllers\Api\Reports\Master\SupplierController;
 use App\Http\Controllers\Api\Reports\Core\PurchaseOrdersController;
+use App\Http\Controllers\Api\Reports\Core\SalesOrdersController;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
 
 
 
@@ -62,5 +60,27 @@ Route::prefix('purchase-orders')->group(function () {
     );            
 
 });
+
+
+// List Sales Order Route
+Route::prefix('sales-orders')->group(function () {
+
+    Route::get('/', [SalesOrdersController::class, 'index']);
+
+    Route::get('/id/{id}', [SalesOrdersController::class, 'showById']);
+
+    Route::get('/number/{salesorder_no}', [SalesOrdersController::class, 'showByNumber']);
+
+    Route::get('/ref/{ref_no}', [SalesOrdersController::class, 'showByRef'])
+        ->where('ref_no', '.*');
+
+    // Dashboard 
+    Route::get(
+        '/dashboard',
+        [SalesOrdersController::class, 'dashboard']
+    );  
+
+});
+
 
 

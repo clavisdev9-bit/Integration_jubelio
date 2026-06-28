@@ -198,6 +198,39 @@ public function scopeDateBetween(
     return $query;
 }
 
+
+public function scopeLocation(
+    Builder $query,
+    ?int $locationId
+)
+{
+    if (!$locationId) {
+        return $query;
+    }
+
+    return $query->where(
+        'location_id',
+        $locationId
+    );
+}
+
+
+public function scopeOpen(Builder $query)
+{
+    return $query->where(
+        'is_closed',
+        false
+    );
+}
+
+public function scopeClosed(Builder $query)
+{
+    return $query->where(
+        'is_closed',
+        true
+    );
+}
+
 public function items()
 {
     return $this->hasMany(PoItem::class, 'purchase_order_id', 'id');

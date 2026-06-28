@@ -5,10 +5,11 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class PurchaseOrderResourcesCollection extends ResourceCollection
+class SalesOrderResourcesCollection extends ResourceCollection
 {
-    protected array $summary;
-
+    /**
+     * Create a new resource collection.
+     */
     public function __construct($resource, array $summary = [])
     {
         parent::__construct($resource);
@@ -25,7 +26,7 @@ class PurchaseOrderResourcesCollection extends ResourceCollection
 
             'summary' => $this->summary,
 
-            'data' => PurchaseOrderResources::collection(
+            'data' => SalesOrderResources::collection(
                 $this->collection
             ),
 

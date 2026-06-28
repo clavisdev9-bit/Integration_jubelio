@@ -9,52 +9,141 @@ class PurchaseOrderDetailResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
      */
-   public function toArray(Request $request): array
+    public function toArray(Request $request): array
     {
         return [
 
-    'id'=>$this->id,
+            /*
+            |--------------------------------------------------------------------------
+            | Identifier
+            |--------------------------------------------------------------------------
+            */
 
-    'purchaseorder_no'=>$this->purchaseorder_no,
+            'id' => $this->id,
 
-    'supplier'=>[
-        'id'=>$this->contact_id,
-        'name'=>$this->supplier_name,
-        'email'=>$this->supplier_email,
-    ],
+            'purchaseorder_no' => $this->purchaseorder_no,
 
-    'transaction_date'=>$this->transaction_date,
+            'reference_no' => $this->ref_no,
 
-    'reference_no'=>$this->ref_no,
+            /*
+            |--------------------------------------------------------------------------
+            | Supplier
+            |--------------------------------------------------------------------------
+            */
 
-    'status'=>$this->status,
+            'supplier' => [
 
-    'payment_method'=>$this->payment_method,
+                'id' => $this->contact_id,
 
-    'payment_term'=>$this->payment_term,
+                'name' => $this->supplier_name,
 
-    'location'=>[
-        'id'=>$this->location_id,
-        'code'=>$this->location_code,
-        'name'=>$this->location_name,
-    ],
+                'email' => $this->supplier_email,
 
-    'note'=>$this->note,
+            ],
 
-    'summary'=>[
-        'sub_total'=>$this->sub_total,
-        'discount'=>$this->total_disc,
-        'tax'=>$this->total_tax,
-        'grand_total'=>$this->grand_total,
-    ],
+            /*
+            |--------------------------------------------------------------------------
+            | Transaction
+            |--------------------------------------------------------------------------
+            */
 
-    'items'=>PurchaseOrderItemResource::collection(
-        $this->whenLoaded('items')
-    ),
+            'transaction_date' => $this->transaction_date?->format('Y-m-d H:i:s'),
 
-];
+            'status' => $this->status,
+
+            'is_closed' => (bool) $this->is_closed,
+
+            'payment_method' => $this->payment_method,
+
+            'payment_term' => $this->payment_term,
+
+            'source' => $this->source,
+
+            'bills' => $this->bills,
+
+            'note' => $this->note,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Location
+            |--------------------------------------------------------------------------
+            */
+
+            'location' => [
+
+                'id' => $this->location_id,
+
+                'code' => $this->location_code,
+
+                'name' => $this->location_name,
+
+            ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Summary
+            |--------------------------------------------------------------------------
+            */
+
+            'summary' => [
+
+                'sub_total' => $this->sub_total,
+
+                'total_disc' => $this->total_disc,
+
+                'total_tax' => $this->total_tax,
+
+                'grand_total' => $this->grand_total,
+
+            ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Integration
+            |--------------------------------------------------------------------------
+            */
+
+            'integration' => [
+
+                'detail_fetched' => (bool) $this->detail_fetched,
+
+                'detail_fetched_at' => $this->detail_fetched_at?->format('Y-m-d H:i:s'),
+
+                'sync_from_jubelio' => (bool) $this->sync_from_jubelio,
+
+                'sync_from_jubelio_at' => $this->sync_from_jubelio_at?->format('Y-m-d H:i:s'),
+
+                'sync_from_jubelio_error' => $this->sync_from_jubelio_error,
+
+                'sync_to_odoo' => (bool) $this->sync_to_odoo,
+
+                'sync_to_odoo_at' => $this->sync_to_odoo_at?->format('Y-m-d H:i:s'),
+
+                'sync_error' => $this->sync_error,
+
+            ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Items
+            |--------------------------------------------------------------------------
+            */
+
+            'items' => PurchaseOrderItemResource::collection(
+                $this->whenLoaded('items')
+            ),
+
+            /*
+            |--------------------------------------------------------------------------
+            | Timestamp
+            |--------------------------------------------------------------------------
+            */
+
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
+
+        ];
     }
 }

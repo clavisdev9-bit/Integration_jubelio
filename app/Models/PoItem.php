@@ -78,20 +78,32 @@ class PoItem extends Model
     ];
 
     protected $casts = [
-        'raw_payload'                => 'array',
-        'sync_from_jubelio'          => 'boolean',
-        'sync_from_jubelio_at'       => 'datetime',
-        'sync_to_odoo'               => 'boolean',
-        'sync_to_odoo_at'            => 'datetime',
-        'sync_to_odoo_next_retry_at' => 'datetime',
-        'qty'                        => 'decimal:4',
-        'qty_in_base'                => 'decimal:4',
-        'price'                      => 'decimal:4',
-        'amount'                     => 'decimal:4',
-        'disc'                       => 'decimal:2',
-        'disc_amount'                => 'decimal:4',
-        'tax_amount'                 => 'decimal:4',
-    ];
+
+    'raw_payload' => 'array',
+
+    'sync_from_jubelio' => 'boolean',
+    'sync_to_odoo' => 'boolean',
+
+    'sync_from_jubelio_at' => 'datetime',
+    'sync_to_odoo_at' => 'datetime',
+    'sync_to_odoo_next_retry_at' => 'datetime',
+
+    'qty' => 'decimal:4',
+    'qty_in_base' => 'decimal:4',
+
+    'price' => 'decimal:4',
+    'buy_price' => 'decimal:4',
+    'last_price_receive' => 'decimal:4',
+    'original_price' => 'decimal:4',
+
+    'disc' => 'decimal:2',
+    'disc_amount' => 'decimal:4',
+
+    'tax_amount' => 'decimal:4',
+    'rate' => 'decimal:2',
+
+    'amount' => 'decimal:4',
+];
 
     public function purchaseOrder()
 {

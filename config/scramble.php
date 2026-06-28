@@ -58,6 +58,7 @@ return [
     ],
 
     'renderer' => 'elements',
+    // 'renderer' => 'scalar',
 
     'renderers' => [
         /*

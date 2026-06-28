@@ -6,18 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MasterProduct extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $table = 'products';
-
-    protected $primaryKey = 'id';
-
-    public $incrementing = true;
-
-    public $timestamps = true;
 
     protected $fillable = [
         'jubelio_item_group_id',
@@ -56,86 +52,73 @@ class MasterProduct extends Model
         'raw_payload' => 'array',
     ];
 
-    // Optional: tampilkan data yang sudah dihapus
-public function scopeOnlyDeleted(Builder $query, bool $only = false): Builder
-{
-    return $only ? $query->onlyTrashed() : $query;
-}
+    /*
+    |---------------------------------------------------
+    | SCOPES
+    |---------------------------------------------------
+    */
 
-// Search
-public function scopeSearch(Builder $query, ?string $search): Builder
-{
-    if (!$search) {
-        return $query;
+    public function scopeSearch(Builder $query, ?string $search): Builder
+    {
+        if (!$search) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($search) {
+            $q->where('item_name', 'like', "%{$search}%")
+              ->orWhere('odoo_ref', 'like', "%{$search}%")
+              ->orWhere('jubelio_item_group_id', 'like', "%{$search}%");
+        });
     }
 
-    return $query->where(function ($q) use ($search) {
-        $q->where('item_name', 'like', "%{$search}%")
-          ->orWhere('odoo_ref', 'like', "%{$search}%")
-          ->orWhere('jubelio_item_group_id', 'like', "%{$search}%");
-    });
-}
+    public function scopeSort(Builder $query, ?string $sortBy = null, ?string $sortDir = null): Builder
+    {
+        $allowedSorts = ['created_at', 'item_name', 'sell_price'];
+        $allowedDirs  = ['asc', 'desc'];
 
-// Dynamic sorting
-public function scopeSort(
-    Builder $query,
-    ?string $sortBy = 'created_at',
-    ?string $sortDir = 'asc'
-): Builder {
-    return $query->orderBy($sortBy, $sortDir);
-}
+        $sortBy = in_array($sortBy, $allowedSorts) ? $sortBy : 'created_at';
+        $sortDir = in_array($sortDir, $allowedDirs) ? $sortDir : 'asc';
 
-// Duplicate check
-public static function isDuplicate(array $data, $id = null): array
-{
-    $errors = [];
-
-    $query = static::where('item_name', $data['item_name']);
-
-    if ($id) {
-        $query->where('id', '!=', $id);
+        return $query->orderBy($sortBy, $sortDir);
     }
 
-    if ($query->exists()) {
-        $errors['item_name'] = ['Product Name Already Exists.'];
-    }
-
-    return $errors;
-}
-
-
-public function scopeFilterDate(
-    Builder $query,
-    ?string $dateFrom,
-    ?string $dateTo
-): Builder {
-
-    return $query
-        ->when($dateFrom, function ($q) use ($dateFrom) {
+    public function scopeFilterDate(
+        Builder $query,
+        ?string $dateFrom,
+        ?string $dateTo
+    ): Builder {
+        return $query->when($dateFrom && $dateTo, function ($q) use ($dateFrom, $dateTo) {
+            $q->whereBetween('created_at', [$dateFrom, $dateTo]);
+        })
+        ->when($dateFrom && !$dateTo, function ($q) use ($dateFrom) {
             $q->whereDate('created_at', '>=', $dateFrom);
         })
-        ->when($dateTo, function ($q) use ($dateTo) {
+        ->when(!$dateFrom && $dateTo, function ($q) use ($dateTo) {
             $q->whereDate('created_at', '<=', $dateTo);
         });
-}
+    }
 
+    /*
+    |---------------------------------------------------
+    | RELATIONS
+    |---------------------------------------------------
+    */
 
-// relasi
-public function category()
-{
-    return $this->belongsTo(
-        ProductCategory::class,
-        'item_category_id',
-        'jubelio_category_id'
-    );
-}
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(
+            ProductCategory::class,
+            'item_category_id',
+            'jubelio_category_id'
+        );
+    }
 
-public function variants()
-{
-    return $this->hasMany(
-        ProductVariant::class,
-        'product_id',
-        'id'
-    );
-}
+    public function variants(): HasMany
+    {
+        return $this->hasMany(
+            ProductVariant::class,
+            'product_id',
+            'id'
+        );
+    }
 }

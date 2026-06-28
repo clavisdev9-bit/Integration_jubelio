@@ -9,31 +9,91 @@ class PurchaseOrderResources extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
      */
-     public function toArray(Request $request): array
+    public function toArray(Request $request): array
     {
         return [
 
-            'id'=>$this->id,
+            /*
+            |--------------------------------------------------------------------------
+            | Identifier
+            |--------------------------------------------------------------------------
+            */
 
-            'purchaseorder_no'=>$this->purchaseorder_no,
+            'id' => $this->id,
 
-            'transaction_date'=>$this->transaction_date?->format('Y-m-d'),
+            'purchaseorder_no' => $this->purchaseorder_no,
 
-            'supplier_name'=>$this->supplier_name,
+            'ref_no' => $this->ref_no,
 
-            'location_name'=>$this->location_name,
+            /*
+            |--------------------------------------------------------------------------
+            | Supplier
+            |--------------------------------------------------------------------------
+            */
 
-            'status'=>$this->status,
+            'supplier_name' => $this->supplier_name,
 
-            'grand_total'=>$this->grand_total,
+            'supplier_email' => $this->supplier_email,
 
-            'created_at'=>$this->created_at?->format('Y-m-d H:i:s'),
+            /*
+            |--------------------------------------------------------------------------
+            | Transaction
+            |--------------------------------------------------------------------------
+            */
 
-            'updated_at'=>$this->updated_at?->format('Y-m-d H:i:s'),
+            'transaction_date' => $this->transaction_date?->format('Y-m-d'),
 
-            ];
+            'status' => $this->status,
+
+            'payment_method' => $this->payment_method,
+
+            'payment_term' => $this->payment_term,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Location
+            |--------------------------------------------------------------------------
+            */
+
+            'location_name' => $this->location_name,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Amount
+            |--------------------------------------------------------------------------
+            */
+
+            'sub_total' => $this->sub_total,
+
+            'total_disc' => $this->total_disc,
+
+            'total_tax' => $this->total_tax,
+
+            'grand_total' => $this->grand_total,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Integration
+            |--------------------------------------------------------------------------
+            */
+
+            'detail_fetched' => (bool) $this->detail_fetched,
+
+            'sync_from_jubelio' => (bool) $this->sync_from_jubelio,
+
+            'sync_to_odoo' => (bool) $this->sync_to_odoo,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Timestamp
+            |--------------------------------------------------------------------------
+            */
+
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
+
+        ];
     }
 }

@@ -9,35 +9,57 @@ class PurchaseOrderItemResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
         return [
 
-    'id'=>$this->id,
+            /*
+            |--------------------------------------------------------------------------
+            | Item
+            |--------------------------------------------------------------------------
+            */
 
-    'item_code'=>$this->item_code,
+            'id' => $this->id,
 
-    'item_name'=>$this->item_name,
+            'item_id' => $this->item_id,
 
-    'description'=>$this->description,
+            'item_code' => $this->item_code,
 
-    'thumbnail'=>$this->thumbnail,
+            'item_name' => $this->item_name,
 
-    'qty'=>$this->qty,
+            'description' => $this->description,
 
-    'unit'=>$this->unit,
+            'variant' => $this->variant,
 
-    'price'=>$this->price,
+            'thumbnail' => $this->thumbnail,
 
-    'discount'=>$this->disc,
+            /*
+            |--------------------------------------------------------------------------
+            | Quantity
+            |--------------------------------------------------------------------------
+            */
 
-    'tax'=>$this->tax_amount,
+            'qty' => $this->qty,
 
-    'amount'=>$this->amount
+            'unit' => $this->unit,
 
-];
+            /*
+            |--------------------------------------------------------------------------
+            | Price
+            |--------------------------------------------------------------------------
+            */
+
+            'price' => $this->price,
+
+            'disc' => $this->disc,
+
+            'disc_amount' => $this->disc_amount,
+
+            'tax_amount' => $this->tax_amount,
+
+            'amount' => $this->amount,
+
+        ];
     }
 }

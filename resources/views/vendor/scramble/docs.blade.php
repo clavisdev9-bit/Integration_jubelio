@@ -50,8 +50,9 @@
     </script>
 
     <style>
-        html, body { margin:0; height:100%; }
+        html, body { margin:0; height:100%;   }
         body { background-color: var(--color-canvas); }
+        
         /* issues about the dark theme of stoplight/mosaic-code-viewer using web component:
          * https://github.com/stoplightio/elements/issues/2188#issuecomment-1485461965
          */

@@ -9,15 +9,11 @@ use Illuminate\Database\Eloquent\Builder;
 
 class MasterSupplier extends Model
 {
-        use HasFactory, SoftDeletes;
-         protected $table = 'suppliers';
+    use HasFactory, SoftDeletes;
 
-    protected $primaryKey = 'id';
+    protected $table = 'suppliers';
 
-    public $incrementing = true;
-
-    public $timestamps = true;
-     protected $fillable = [
+    protected $fillable = [
         'jubelio_contact_id',
         'odoo_id',
         'contact_name',
@@ -59,40 +55,41 @@ class MasterSupplier extends Model
 
     protected $casts = [
         'raw_payload'                => 'array',
-        'is_dropshipper'             => 'boolean',
-        'is_reseller'                => 'boolean',
-        'sync_from_jubelio'          => 'boolean',
-        'sync_from_jubelio_at'       => 'datetime',
-        'sync_to_odoo'               => 'boolean',
-        'sync_to_odoo_at'            => 'datetime',
-        'sync_to_odoo_next_retry_at' => 'datetime',
+        'is_dropshipper'            => 'boolean',
+        'is_reseller'               => 'boolean',
+        'sync_from_jubelio'         => 'boolean',
+        'sync_to_odoo'              => 'boolean',
+        'sync_from_jubelio_at'      => 'datetime',
+        'sync_to_odoo_at'           => 'datetime',
+        'sync_to_odoo_next_retry_at'=> 'datetime',
     ];
 
+    /*
+    |---------------------------------------------------
+    | SCOPES
+    |---------------------------------------------------
+    */
 
-    public function scopeOnlyDeleted(Builder $query, bool $only = false): Builder
-{
-    return $only ? $query->onlyTrashed() : $query;
-}
+    public function scopeSearch(Builder $query, ?string $search): Builder
+    {
+        if (!$search) {
+            return $query;
+        }
 
-// Search
-public function scopeSearch(Builder $query, ?string $search): Builder
-{
-    if (!$search) {
-        return $query;
+        return $query->where('contact_name', 'like', "%{$search}%");
     }
 
-    return $query->where(function ($q) use ($search) {
-        $q->where('contact_name', 'like', "%{$search}%");
-    });
-}
+    public function scopeSort(
+        Builder $query,
+        ?string $sortBy = null,
+        ?string $sortDir = null
+    ): Builder {
+        $allowedSorts = ['created_at', 'contact_name', 'contact_full'];
+        $allowedDirs  = ['asc', 'desc'];
 
-// Dynamic sorting
-public function scopeSort(
-    Builder $query,
-    ?string $sortBy = 'created_at',
-    ?string $sortDir = 'asc'
-): Builder {
-    return $query->orderBy($sortBy, $sortDir);
-}
+        $sortBy = in_array($sortBy, $allowedSorts) ? $sortBy : 'created_at';
+        $sortDir = in_array($sortDir, $allowedDirs) ? $sortDir : 'asc';
 
+        return $query->orderBy($sortBy, $sortDir);
+    }
 }
