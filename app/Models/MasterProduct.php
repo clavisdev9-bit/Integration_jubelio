@@ -58,18 +58,43 @@ class MasterProduct extends Model
     |---------------------------------------------------
     */
 
-    public function scopeSearch(Builder $query, ?string $search): Builder
-    {
-        if (!$search) {
-            return $query;
-        }
+    // public function scopeSearch(Builder $query, ?string $search): Builder
+    // {
+    //     if (!$search) {
+    //         return $query;
+    //     }
 
-        return $query->where(function ($q) use ($search) {
-            $q->where('item_name', 'like', "%{$search}%")
-              ->orWhere('odoo_ref', 'like', "%{$search}%")
-              ->orWhere('jubelio_item_group_id', 'like', "%{$search}%");
-        });
+    //     return $query->where(function ($q) use ($search) {
+    //         $q->where('item_name', 'like', "%{$search}%")
+    //           ->orWhere('odoo_ref', 'like', "%{$search}%")
+    //           ->orWhere('jubelio_item_group_id', 'like', "%{$search}%");
+    //     });
+    // }
+
+    public function scopeSearch(Builder $query, ?string $search): Builder
+{
+    if (blank($search)) {
+        return $query;
     }
+
+    return $query->where(function ($q) use ($search) {
+
+        // Search di tabel products
+        $q->where('item_name', 'ILIKE', "%{$search}%")
+          ->orWhere('odoo_ref', 'ILIKE', "%{$search}%")
+          ->orWhere('jubelio_item_group_id', 'ILIKE', "%{$search}%")
+
+          // Search SKU / Item Code di product_variants
+          ->orWhereHas('variants', function ($variant) use ($search) {
+
+              $variant->where('item_code', 'ILIKE', "%{$search}%")
+                      ->orWhere('item_name', 'ILIKE', "%{$search}%")
+                      ->orWhere('barcode', 'ILIKE', "%{$search}%");
+
+          });
+
+    });
+}
 
     public function scopeSort(Builder $query, ?string $sortBy = null, ?string $sortDir = null): Builder
     {
