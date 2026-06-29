@@ -174,7 +174,7 @@ class SalesOrdersController extends Controller
 
 
      /**
-        * Purchase order Dashboard
+        * Sales order Dashboard
     */
      public function dashboard()
     {
