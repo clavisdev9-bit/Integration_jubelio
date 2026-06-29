@@ -252,14 +252,38 @@ class SalesOrderOdooSyncService
     /**
      * Update SO yang sudah ada di Odoo.
      */
+    // ini kode lama private function updateInOdoo(int $odooId, SalesOrder $so, int $partnerId, array $orderLines): void
+    // {
+    //     $this->odoo->execute(
+    //         'sale.order',
+    //         'write',
+    //         [[$odooId], $this->mapToOdoo($so, $partnerId, $orderLines)]
+    //     );
+    // }
+
     private function updateInOdoo(int $odooId, SalesOrder $so, int $partnerId, array $orderLines): void
-    {
-        $this->odoo->execute(
-            'sale.order',
-            'write',
-            [[$odooId], $this->mapToOdoo($so, $partnerId, $orderLines)]
-        );
+{
+    // 1. Ambil semua order line yang ada
+    $existingLines = $this->odoo->execute(
+        'sale.order.line',
+        'search_read',
+        [[['order_id', '=', $odooId]]],
+        ['fields' => ['id'], 'limit' => 100]
+    );
+
+    // 2. Hapus semua line lama
+    if (! empty($existingLines)) {
+        $lineIds = array_column($existingLines, 'id');
+        $this->odoo->execute('sale.order.line', 'unlink', [$lineIds]);
     }
+
+    // 3. Update dengan line baru
+    $this->odoo->execute(
+        'sale.order',
+        'write',
+        [[$odooId], $this->mapToOdoo($so, $partnerId, $orderLines)]
+    );
+}
 
     /**
      * Mapping field Jubelio → Odoo sale.order

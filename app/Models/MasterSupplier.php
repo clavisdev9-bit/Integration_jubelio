@@ -76,7 +76,11 @@ class MasterSupplier extends Model
             return $query;
         }
 
-        return $query->where('contact_name', 'like', "%{$search}%");
+        // return $query->where('contact_name', 'like', "%{$search}%");
+          return $query->whereRaw(
+        'LOWER(contact_name) LIKE ?',
+        ['%' . strtolower($search) . '%']
+    );
     }
 
     public function scopeSort(

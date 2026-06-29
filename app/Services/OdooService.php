@@ -50,15 +50,23 @@ class OdooService
                         ]
                     );
 
-                if (!$response->successful()) {
-
+                if (! $response->successful()) {
                     throw new \Exception(
-                        'Failed login Odoo : ' .
-                        $response->body()
+                        'Failed login Odoo : ' . $response->body()
                     );
                 }
 
-                return $response->json('result');
+                $json = $response->json();
+
+                if (isset($json['error'])) {
+                    throw new \Exception(
+                        ($json['error']['message'] ?? 'Login Error') .
+                        PHP_EOL .
+                        ($json['error']['data']['message'] ?? '')
+                    );
+                }
+
+                return $json['result'];
             }
         );
     }
@@ -97,14 +105,31 @@ class OdooService
                 ]
             );
 
-        if (!$response->successful()) {
-
+        // HTTP Error
+        if (! $response->successful()) {
             throw new \Exception(
-                'Odoo API Error : ' .
-                $response->body()
+                'Odoo HTTP Error : ' . $response->body()
             );
         }
 
-        return $response->json('result');
+        $json = $response->json();
+
+        // JSON-RPC Error dari Odoo
+        if (isset($json['error'])) {
+
+            $message = $json['error']['message'] ?? 'Unknown Odoo Error';
+
+            if (! empty($json['error']['data']['message'])) {
+                $message .= PHP_EOL . $json['error']['data']['message'];
+            }
+
+            if (! empty($json['error']['data']['debug'])) {
+                $message .= PHP_EOL . PHP_EOL . $json['error']['data']['debug'];
+            }
+
+            throw new \Exception($message);
+        }
+
+        return $json['result'];
     }
 }
