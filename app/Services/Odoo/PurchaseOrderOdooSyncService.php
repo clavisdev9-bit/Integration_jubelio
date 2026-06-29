@@ -221,14 +221,38 @@ class PurchaseOrderOdooSyncService
     /**
      * Update PO yang sudah ada di Odoo.
      */
+    // private function updateInOdoo(int $odooId, PurchaseOrder $po, int $partnerId, array $orderLines): void
+    // {
+    //     $this->odoo->execute(
+    //         'purchase.order',
+    //         'write',
+    //         [[$odooId], $this->mapToOdoo($po, $partnerId, $orderLines)]
+    //     );
+    // }
+
     private function updateInOdoo(int $odooId, PurchaseOrder $po, int $partnerId, array $orderLines): void
-    {
-        $this->odoo->execute(
-            'purchase.order',
-            'write',
-            [[$odooId], $this->mapToOdoo($po, $partnerId, $orderLines)]
-        );
-    }
+        {
+            // 1. Ambil semua order line yang ada
+            $existingLines = $this->odoo->execute(
+                'purchase.order.line',
+                'search_read',
+                [[['order_id', '=', $odooId]]],
+                ['fields' => ['id'], 'limit' => 100]
+            );
+
+            // 2. Hapus semua line lama
+            if (! empty($existingLines)) {
+                $lineIds = array_column($existingLines, 'id');
+                $this->odoo->execute('purchase.order.line', 'unlink', [$lineIds]);
+            }
+
+            // 3. Update dengan line baru
+            $this->odoo->execute(
+                'purchase.order',
+                'write',
+                [[$odooId], $this->mapToOdoo($po, $partnerId, $orderLines)]
+            );
+        }
 
     /**
      * Mapping field Jubelio → Odoo purchase.order
