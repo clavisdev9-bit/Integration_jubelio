@@ -9,6 +9,9 @@ use App\Http\Controllers\Api\Reports\Master\ProductsController;
 use App\Http\Controllers\Api\Reports\Master\SupplierController;
 use App\Http\Controllers\Api\Reports\Core\PurchaseOrdersController;
 use App\Http\Controllers\Api\Reports\Core\SalesOrdersController;
+use App\Http\Controllers\Api\Reports\Master\LocationsController;
+
+
 
 
 
@@ -79,6 +82,18 @@ Route::prefix('sales-orders')->group(function () {
         '/dashboard',
         [SalesOrdersController::class, 'dashboard']
     );  
+
+});
+
+Route::prefix('locations')->group(function () {
+
+    Route::get('/', [LocationsController::class, 'index']);
+
+    Route::get('/dashboard', [LocationsController::class, 'dashboard']);
+
+    Route::get('/id/{id}', [LocationsController::class, 'showById']);
+
+    Route::get('/code/{locationCode}', [LocationsController::class, 'showByCode']);
 
 });
 

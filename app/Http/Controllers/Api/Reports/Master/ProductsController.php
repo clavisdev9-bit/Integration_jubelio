@@ -9,7 +9,7 @@ use App\Http\Requests\ProductsValidationIndex;
 use App\Http\Resources\ProductsResourcesCollection;
 use Dedoc\Scramble\Attributes\Group;
 
-#[Group('URL API Master')]
+#[Group('URL API MASTER PRODUCT')]
 class ProductsController extends Controller
 {
     public function __construct(

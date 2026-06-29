@@ -9,7 +9,7 @@ use App\Http\Requests\SupplierValidationIndex;
 use App\Http\Resources\SupplierResourcesCollection;
 use Dedoc\Scramble\Attributes\Group;
 
-#[Group('URL API Master')]
+#[Group('URL API MASTER SUPPLIER')]
 class SupplierController extends Controller
 {
     public function __construct(
