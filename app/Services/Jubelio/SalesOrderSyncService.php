@@ -148,6 +148,7 @@ class SalesOrderSyncService
             'customer_phone'       => $detail['customer_phone']       ?? null,
             'customer_email'       => $detail['customer_email']       ?? null,
             'is_tax_included'      => $detail['is_tax_included']      ?? false,
+            'is_cod'               => $detail['is_cod']                ?? false,
             'sub_total'            => $detail['sub_total']            ?? 0,
             'total_disc'           => $detail['total_disc']           ?? 0,
             'total_tax'            => $detail['total_tax']            ?? 0,

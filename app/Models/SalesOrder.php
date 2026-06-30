@@ -55,6 +55,7 @@ class SalesOrder extends Model
         'cancel_reason',
         'marked_as_complete',
         'payment_method',
+        'is_cod',   
         'location_id',
         'location_name',
         'invoice_id',
@@ -96,6 +97,7 @@ class SalesOrder extends Model
         'sub_total'                  => 'decimal:4',
         'total_disc'                 => 'decimal:4',
         'total_tax'                  => 'decimal:4',
+        'is_cod'                     => 'boolean',
     ];
 
     // ── Relationships ────────────────────────────────────────────────────────
