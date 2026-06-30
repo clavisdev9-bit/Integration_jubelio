@@ -61,6 +61,7 @@ class SalesOrdersController extends Controller
                 'wms_status',
                 'payment_method',
                 'location_name',
+                'is_cod',
                 'sub_total',
                 'total_disc',
                 'total_tax',

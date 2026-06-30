@@ -48,6 +48,8 @@ class SalesOrderResources extends JsonResource
 
             'location_name' => $this->location_name,
 
+            'is_cod' => $this->is_cod,
+
             // =========================
             // QTY
             // =========================
