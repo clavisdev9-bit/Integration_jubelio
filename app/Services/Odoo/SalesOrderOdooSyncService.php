@@ -18,7 +18,6 @@ class SalesOrderOdooSyncService
     // ────────────────────────────────────────────────────────────────────────
     // Push semua SO yang belum sync ke Odoo
     // ────────────────────────────────────────────────────────────────────────
-
     public function pushAll(): void
     {
         $orders = SalesOrder::where('sync_to_odoo', false)
@@ -168,34 +167,91 @@ class SalesOrderOdooSyncService
         });
     }
 
+
     /**
      * Build order_line format Odoo dari items SO.
      */
     private function buildOrderLines(iterable $items): array
-    {
-        $lines = [];
+        {
+            //  dd($items);
+            $lines = [];
 
-        foreach ($items as $item) {
-            $odooProductId = $this->getOdooProductId($item->item_code);
+            foreach ($items as $item) {
 
-            if (! $odooProductId) {
-                Log::warning("[Odoo SO] Produk tidak ditemukan di Odoo", [
-                    'item_code' => $item->item_code,
-                    'item_name' => $item->item_name,
-                ]);
-                continue;
+                $odooProductId = $this->getOdooProductId($item->item_code);
+
+                if (!$odooProductId) {
+                    continue;
+                }
+
+                //1   kode ini udah running bagus tapi masih mau saya sempurnakan
+                // $qty = max(1, (float) $item->qty_in_base);
+                // sementara gunakan amount
+                // $netPrice = round((float) $item->amount / $qty, 2);
+
+                // Log::info('Push SO Line', [
+                //     'item_code'        => $item->item_code,
+                //     'price'            => $item->price,
+                //     'sell_price'       => $item->sell_price,
+                //     'original_price'   => $item->original_price,
+                //     'disc_amount'      => $item->disc_amount,
+                //     'amount'           => $item->amount,
+                //     'qty'              => $qty,
+                //     'price_unit'       => $netPrice,
+                // ]);
+
+                // ini untuk menghindari error "The tax_id field is required" di Odoo, karena di Odoo 16, field tax_id tidak boleh kosong. Jadi kita set tax_id ke empty list.
+                // $lines[] = [0,0,[
+                //     'product_id'      => $odooProductId,
+                //     'name'            => $item->item_name,
+                //     'product_uom_qty' => $qty,
+                //     'price_unit'      => $netPrice,
+                //     'tax_id'          => [[6,0,[]]],
+                // ]];
+
+
+                //2 start code baru ini juga bagus tapi masih mau saya sempurnakan lagi 
+                // $qty = max(1, (float) $item->qty_in_base);
+
+                //     $price = (float) $item->price;
+
+                //     $discount = $price > 0
+                //         ? round(((float)$item->disc_amount / $price) * 100, 6)
+                //         : 0;
+
+                //     $lines[] = [0, 0, [
+                //         'product_id'      => $odooProductId,
+                //         'name'            => $item->item_name,
+                //         'product_uom_qty' => $qty,
+                //         'price_unit'      => $price,
+                //         'discount'        => $discount,
+                //         'tax_id'          => [[6, 0, []]],
+                //     ]];
+
+                $qty = max(1, (float) $item->qty);
+
+                $price = round((float)$item->price, 2);
+
+                $amount = round((float)$item->amount, 2);
+
+                // $discount = $price > 0  cara rekomendasinkan
+                //     ? round((($price - $amount) / $price) * 100, 2)
+                //     : 0;
+
+                    $discount = (($price - $amount) / $price) * 100;
+
+                $lines[] = [0,0,[
+                    'product_id'      => $odooProductId,
+                    'name'            => $item->item_name,
+                    'product_uom_qty' => $qty,
+                    'price_unit'      => $price,
+                    'discount'        => $discount,
+                    'tax_id'          => [[6,0,[]]],
+                ]];
             }
 
-            $lines[] = [0, 0, [
-                'product_id'   => $odooProductId,
-                'name'         => $item->item_name ?? $item->description,
-                'product_uom_qty' => (float) $item->qty_in_base,
-                'price_unit'   => (float) $item->price,
-            ]];
+            return $lines;
         }
-
-        return $lines;
-    }
 
     /**
      * Cari odoo product.product id berdasarkan item_code.
@@ -252,54 +308,33 @@ class SalesOrderOdooSyncService
     /**
      * Update SO yang sudah ada di Odoo.
      */
-    // ini kode lama private function updateInOdoo(int $odooId, SalesOrder $so, int $partnerId, array $orderLines): void
-    // {
-    //     $this->odoo->execute(
-    //         'sale.order',
-    //         'write',
-    //         [[$odooId], $this->mapToOdoo($so, $partnerId, $orderLines)]
-    //     );
-    // }
-
     private function updateInOdoo(int $odooId, SalesOrder $so, int $partnerId, array $orderLines): void
-{
-    // 1. Ambil semua order line yang ada
-    $existingLines = $this->odoo->execute(
-        'sale.order.line',
-        'search_read',
-        [[['order_id', '=', $odooId]]],
-        ['fields' => ['id'], 'limit' => 100]
-    );
+        {
+            // 1. Ambil semua order line yang ada
+            $existingLines = $this->odoo->execute(
+                'sale.order.line',
+                'search_read',
+                [[['order_id', '=', $odooId]]],
+                ['fields' => ['id'], 'limit' => 100]
+            );
 
-    // 2. Hapus semua line lama
-    if (! empty($existingLines)) {
-        $lineIds = array_column($existingLines, 'id');
-        $this->odoo->execute('sale.order.line', 'unlink', [$lineIds]);
-    }
+            // 2. Hapus semua line lama
+            if (! empty($existingLines)) {
+                $lineIds = array_column($existingLines, 'id');
+                $this->odoo->execute('sale.order.line', 'unlink', [$lineIds]);
+            }
 
-    // 3. Update dengan line baru
-    $this->odoo->execute(
-        'sale.order',
-        'write',
-        [[$odooId], $this->mapToOdoo($so, $partnerId, $orderLines)]
-    );
-}
+            // 3. Update dengan line baru
+            $this->odoo->execute(
+                'sale.order',
+                'write',
+                [[$odooId], $this->mapToOdoo($so, $partnerId, $orderLines)]
+            );
+        }
 
     /**
      * Mapping field Jubelio → Odoo sale.order
-     */
-    // private function mapToOdoo(SalesOrder $so, int $partnerId, array $orderLines): array
-    // {
-    //     return [
-    //         'partner_id'       => $partnerId,
-    //         'date_order'       => $so->transaction_date?->format('Y-m-d H:i:s'),
-    //         'client_order_ref' => $so->salesorder_no,
-    //         'note'             => $so->note,
-    //         'order_line'       => $orderLines,
-    //     ];
-
-
-    // }
+    */
     private function mapToOdoo(SalesOrder $so, int $partnerId, array $orderLines): array
     {
         return [
